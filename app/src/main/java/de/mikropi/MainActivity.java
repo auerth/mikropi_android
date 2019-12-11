@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
                             return false;
                         }
                         this.doubleBackToExitPressedOnce = true;
-                        Toast.makeText(this, "Bitte klicken Sie erneut auf zurück, um die App zu beenden.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.closing), Toast.LENGTH_SHORT).show();
                         new Handler().postDelayed(new Runnable() {
 
                             @Override

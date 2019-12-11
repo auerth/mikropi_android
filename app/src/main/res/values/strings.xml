@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">mikropi</string>
+    <string name="closing">Bitte klicke erneut auf zurück, um die App zu beenden.</string>
+
 </resources>
