@@ -21,6 +21,9 @@ public class MainActivity extends AppCompatActivity {
     private WebView webView;
     private final String TAG = "Mikropi-Log";
     private boolean doubleBackToExitPressedOnce = false;
+    private boolean shortPress = false;
+    private boolean longPress = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
         webView = (WebView) findViewById(R.id.webView);
         webView.setWebChromeClient(new Chrome(this));
         webView.getSettings().setJavaScriptEnabled(true);
-        clearCache(this, 0);
 
         webView.setWebViewClient(new WebViewClient() {
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -41,12 +43,23 @@ public class MainActivity extends AppCompatActivity {
         webView.loadUrl("https://mikropi.de/login.php");
     }
 
+    @Override
+    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN){
+            Toast.makeText(this, "Long Press", Toast.LENGTH_SHORT).show();
+            //Long Press code goes here
+
+            return true;
+        }
+        return super.onKeyLongPress(keyCode, event);
+    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
             switch (keyCode) {
                 case KeyEvent.KEYCODE_BACK:
+
                     String url = webView.getUrl();
                     if (url.contains("index.php") && !url.contains("cuts")) {
                         if (doubleBackToExitPressedOnce) {
@@ -71,8 +84,23 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     return true;
-            }
+                case KeyEvent.KEYCODE_VOLUME_DOWN:
+                        if (doubleBackToExitPressedOnce) {
+                            clearCache(this, 0);
+                            Toast.makeText(this, "Cache cleared", Toast.LENGTH_SHORT).show();
+                            return false;
+                        }
+                        this.doubleBackToExitPressedOnce = true;
+                        new Handler().postDelayed(new Runnable() {
 
+                            @Override
+                            public void run() {
+                                doubleBackToExitPressedOnce=false;
+                            }
+                        }, 2000);
+                    }
+
+                    return true;
         }
         return super.onKeyDown(keyCode, event);
     }
