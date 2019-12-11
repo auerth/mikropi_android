@@ -4,13 +4,19 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.io.File;
@@ -19,25 +25,48 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
+    private ProgressBar spinner;
+    private Button btnReload;
+
     private final String TAG = "Mikropi-Log";
     private boolean doubleBackToExitPressedOnce = false;
-    private boolean shortPress = false;
-    private boolean longPress = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         webView = (WebView) findViewById(R.id.webView);
+        spinner = (ProgressBar)findViewById(R.id.spinner);
+        btnReload = (Button)findViewById(R.id.reload);
+
+        btnReload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                btnReload.setVisibility(View.GONE);
+                webView.reload();
+            }
+        });
+        spinner.getIndeterminateDrawable().setColorFilter(0xFFFFFFFF, android.graphics.PorterDuff.Mode.MULTIPLY);
         webView.setWebChromeClient(new Chrome(this));
         webView.getSettings().setJavaScriptEnabled(true);
-
         webView.setWebViewClient(new WebViewClient() {
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                // do your handling codes here, which url is the requested url
-                // probably you need to open that url rather than redirect:
+                spinner.setVisibility(View.VISIBLE);
+
                 view.loadUrl(url);
                 return false; // then it is not handled by default action
+            }
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                spinner.setVisibility(View.GONE);
+                webView.setVisibility(View.VISIBLE);
+            };
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error){
+                //Your code to do
+                webView.setVisibility(View.GONE);
+                btnReload.setVisibility(View.VISIBLE);
+
             }
         });
         webView.loadUrl("https://mikropi.de/login.php");
